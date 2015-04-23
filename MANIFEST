@@ -1,3 +1,5 @@
 Changes
+lib/Object/Instant.pm
 Makefile.PL
 MANIFEST
+t/basic.t
