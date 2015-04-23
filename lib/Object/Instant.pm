@@ -47,7 +47,7 @@ Object::Instant - Create objects without those pesky classes
     my $obj = Object::Instant->new(sub {
                   my ($self, $method, @args) = @_;
 
-                  print "method name: $method, first arg: $args[0]\n";
+                  print "self: $self, method name: $method, first arg: $args[0]\n";
               });
 
     $obj->whatever(123);
@@ -55,13 +55,13 @@ Object::Instant - Create objects without those pesky classes
 
 =head1 DESCRIPTION
 
-Sometimes you want something that acts like an object but you don't want to go to all the trouble to create a new package, constructor, methods, etc. This module is a trivial wrapper around perl's L<AUTOLOAD> functionality that allows us to intercept method calls.
+Sometimes you want something that acts like an object but you don't want to go to all the trouble of creating a new package, with constructor and methods and so on. This module is a trivial wrapper around perl's L<AUTOLOAD> functionality which intercepts method calls and lets you handle them in a single C<sub>.
 
 =head1 USE-CASES
 
 =head2 AUTOLOAD SYNTACTIC SUGAR
 
-L<AUTOLOAD> allows you to dispatch on method names at run-time which can sometimes be quite useful, for example in RPC protocols where you transmit method call messages to another process or server for them to be executed remotely. Unfortunately, using L<AUTOLOAD> is a bit annoying since the interface is somewhat arcane. L<Object::Instance> is a nicer interface to the most commonly used AUTOLOAD functionality:
+L<AUTOLOAD> allows you to dispatch on method names at run-time which can sometimes be useful, for example in RPC protocols where you transmit method call messages to another process for them to be executed remotely. Unfortunately, using L<AUTOLOAD> is a bit annoying since the interface is somewhat arcane. L<Object::Instance> is a nicer interface to the most commonly used AUTOLOAD functionality:
 
     my $obj = Object::Instant->new(sub {
                 my ($self, $method, @args) = @_;
@@ -75,7 +75,7 @@ L<AUTOLOAD> allows you to dispatch on method names at run-time which can sometim
 
 =head2 PLACE-HOLDER OBJECTS
 
-Some APIs require you to pass in or provide an object but don't actually end up using it. Instead of passing in undef and getting a weird C<Can't call method "XYZ" on an undefined value> error, you can pass in an L<Object::Instant> that will throw a helpful exception instead:
+Some APIs require you to pass in or provide an object but then don't actually end up using it. Instead of passing in undef and getting a weird C<Can't call method "XYZ" on an undefined value> error, you can pass in an L<Object::Instant> which will throw a helpful exception instead:
 
     my $obj = Some::Api->new(
                 error_logger => Object::Instant->new(sub {
@@ -87,9 +87,10 @@ Some APIs require you to pass in or provide an object but don't actually end up 
 
 Again, some APIs may never end up using an object so you may wish to "lazily" defer the creation of that object until a method is actually called on it.
 
-For example, suppose you have a large L<CGI> script that creates a L<DBI> connection at the start of the script, but only actually accesses the database handle for a small portion of the requests. You can prevent the script from accessing the database on the majority of requests with L<Object::Instant>:
+For example, suppose you have a large L<CGI> script which always opens a L<DBI> connection but only actually accesses this connection for a small portion of runs. You can prevent the script from accessing the database on the majority of runs with L<Object::Instant>:
 
     my $dbh = Object::Instant->new(sub {
+                require DBI;
                 $_[0] = DBI->connect($dsn, $user, $pass, { RaiseError => 1)
                     || die "Unable to connect to database: $DBI::errstr";
 
@@ -99,6 +100,26 @@ For example, suppose you have a large L<CGI> script that creates a L<DBI> connec
               });
 
 This works because the C<$_[0]> argument is actually an alias to C<$dbh>. After you call a method on C<$dbh> for the first time it will change from a C<Object::Instant> object into a C<DBI> object (assuming the C<< DBI->connect >> constructor succeeds).
+
+To demonstrate this, here is an example with L<Session::Token>:
+
+    my $o = Object::Instant->new(sub {
+              require Session::Token;
+              $_[0] = Session::Token->new;
+
+              my ($self, $method, @args) = @_;
+              return $self->$method(@args);
+            });
+
+    say ref $o;
+    ## Object::Instant
+
+    say $o->get;
+    ## mhDPtfLlFMGl5kyNcJgFt7
+
+    say ref $o;
+    ## Session::Token
+
 
 =head1 SEE ALSO
 
