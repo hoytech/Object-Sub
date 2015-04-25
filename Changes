@@ -1,2 +1,5 @@
+0.101   2015-04-25
+  * Rename to Object::Sub
+
 0.100   2015-04-22
   * Initial CPAN release

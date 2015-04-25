@@ -1,5 +1,5 @@
 Changes
-lib/Object/Instant.pm
+lib/Object/Sub.pm
 Makefile.PL
 MANIFEST
 t/basic.t

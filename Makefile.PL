@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 
 
 my %args = (
-    NAME => 'Object::Instant',
-    VERSION_FROM => 'lib/Object/Instant.pm',
+    NAME => 'Object::Sub',
+    VERSION_FROM => 'lib/Object/Sub.pm',
     PREREQ_PM => {
     },
     LIBS => [],
@@ -16,8 +16,8 @@ my %args = (
     },
     META_MERGE => {
       resources => {
-        repository => 'git://github.com/hoytech/Object-Instant.git',
-        bugtracker => 'https://github.com/hoytech/Object-Instant/issues',
+        repository => 'git://github.com/hoytech/Object-Sub.git',
+        bugtracker => 'https://github.com/hoytech/Object-Sub/issues',
       },
     },
 );

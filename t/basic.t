@@ -2,15 +2,15 @@ use strict;
 
 use Test::More tests => 7;
 
-use Object::Instant;
+use Object::Sub;
 
 
 
 {
-  my $o = Object::Instant->new(sub {
+  my $o = Object::Sub->new(sub {
     my ($self, $method, @args) = @_;
 
-    is(ref $self, 'Object::Instant');
+    is(ref $self, 'Object::Sub');
     is($method, 'hello');
     is($args[0], 'world');
   });
@@ -24,7 +24,7 @@ use Object::Instant;
 ## Test class
 
 {
-  package Object::Instant::Test::Counter;
+  package Object::Sub::Test::Counter;
 
   sub new {
     my ($class, @args) = @_;
@@ -52,19 +52,19 @@ use Object::Instant;
 
 
 {
-  my $o = Object::Instant->new(sub {
-            $_[0] = Object::Instant::Test::Counter->new();
+  my $o = Object::Sub->new(sub {
+            $_[0] = Object::Sub::Test::Counter->new();
 
             my ($self, $method, @args) = @_;
 
             return $self->$method(@args);
           });
 
-  is (ref $o, 'Object::Instant');
+  is (ref $o, 'Object::Sub');
 
   is ($o->add(4), 4);
 
-  is (ref $o, 'Object::Instant::Test::Counter');
+  is (ref $o, 'Object::Sub::Test::Counter');
 
   is ($o->add(1), 5);
 }
