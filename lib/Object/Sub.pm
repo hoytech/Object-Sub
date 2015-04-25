@@ -96,11 +96,10 @@ For example, suppose you have a large L<CGI> script which always opens a L<DBI> 
 
     my $dbh = Object::Sub->new(sub {
                 require DBI;
-                $_[0] = DBI->connect($dsn, $user, $pass, { RaiseError => 1)
+                $_[0] = DBI->connect($dsn, $user, $pass, { RaiseError => 1 })
                     || die "Unable to connect to database: $DBI::errstr";
 
                 my ($self, $method, @args) = @_;
-
                 return $self->$method(@args);
               });
 
