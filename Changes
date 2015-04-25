@@ -1,5 +1,6 @@
 0.101   2015-04-25
   * Rename to Object::Sub
+  * bugfix for older perls: prevent DESTROY from being handled by AUTOLOAD
 
 0.100   2015-04-22
   * Initial CPAN release

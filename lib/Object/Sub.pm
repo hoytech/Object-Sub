@@ -2,7 +2,7 @@ package Object::Sub;
 
 use strict;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 our $AUTOLOAD;
 
