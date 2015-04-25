@@ -27,6 +27,11 @@ sub AUTOLOAD {
   return $_[0]->{cb}->($_[0], $name, @_[1 .. $#_]);
 }
 
+## Prevent DESTROY method from being handled by AUTOLOAD
+
+sub DESTROY {
+}
+
 
 1;
 
