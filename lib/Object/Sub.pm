@@ -83,14 +83,26 @@ L<AUTOLOAD> allows you to dispatch on method names at run-time which can sometim
 Some APIs require you to pass in or provide an object but then don't actually end up using it. Instead of passing in undef and getting a weird C<Can't call method "XYZ" on an undefined value> error, you can pass in an L<Object::Sub> which will throw a helpful exception instead:
 
     my $obj = Some::API->new(
-                error_logger => Object::Sub->new(sub {
-                                  die "Please provide an 'error_logger' object to Some::API"
-                                })
+                logger => Object::Sub->new(sub {
+                            die "Please provide an 'logger' object to Some::API"
+                          })
+              );
+
+Alternatively, you may choose to minimally implement the API "inline" in your program:
+
+    my $obj = Some::API->new(
+                logger => Object::Sub->new(sub {
+                            my ($self, $method, @args) = @_;
+
+                            return if $method eq 'debug';
+
+                            say STDERR "Some::API $method: " . join(' ', @args);
+                          })
               );
 
 =head2 LAZY OBJECT CREATION
 
-Again, some APIs may never end up using an object so you may wish to "lazily" defer the creation of that object until a method is actually called on it.
+Again, some APIs may never end up using an object so you may wish to "lazily" defer the creation of that object until a method is actually called on it. This module can help you make the cases where it doesn't use it more efficient.
 
 For example, suppose you have a large L<CGI> script which always opens a L<DBI> connection but only actually accesses this connection for a small portion of runs. You can prevent the script from accessing the database on the majority of runs with L<Object::Sub>:
 
@@ -103,7 +115,7 @@ For example, suppose you have a large L<CGI> script which always opens a L<DBI> 
                 return $self->$method(@args);
               });
 
-This works because the C<$_[0]> argument is actually an alias to C<$dbh>. After you call a method on C<$dbh> for the first time it will change from a C<Object::Sub> object into a C<DBI> object (assuming the C<< DBI->connect >> constructor succeeds).
+Note how we don't even load or compile the module until the first method is called. After you call a method on C<$dbh> it changes from a C<Object::Sub> object into a C<DBI> object (assuming the C<< DBI->connect >> constructor succeeds). This works because the C<$_[0]> argument is actually an alias to C<$dbh> and can be modified.
 
 To demonstrate this, here is an example with L<Session::Token>:
 
@@ -123,6 +135,11 @@ To demonstrate this, here is an example with L<Session::Token>:
 
     say ref $o;
     ## Session::Token
+
+    say $o->get;
+    ## 4JYkGgwWbYWGleU7Qk912P
+
+With L<Object::Sub> you can lazily "create" and pass around objects before their constructor code has even been loaded.
 
 
 =head1 SEE ALSO
