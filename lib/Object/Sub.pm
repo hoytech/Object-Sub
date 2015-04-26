@@ -156,6 +156,11 @@ To demonstrate this, here is an example with L<Session::Token>:
 With L<Object::Sub> you can lazily "create" and pass around objects before their constructor code has even been loaded.
 
 
+=head1 BUGS
+
+Although not really a bug in this module, common perl code tends to copy references of objects. Any code that overwrites the caller object (for example in the L<LAZY OBJECT CREATION> section) may only update one of the copies.
+
+
 =head1 SEE ALSO
 
 L<Object-Sub github repo|https://github.com/hoytech/Object-Sub>
