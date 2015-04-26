@@ -6,6 +6,23 @@ our $VERSION = '0.101';
 
 our $AUTOLOAD;
 
+use overload fallback => 1,
+             '&{}' => sub {
+                        my $self_ref = \$_[0];
+
+                        return sub {
+                          return $$self_ref->{cb}->($$self_ref, undef, @_);
+                        };
+                      };
+
+sub AUTOLOAD {
+  die "$_[0] is not an object" if !ref $_[0];
+
+  my $name = $AUTOLOAD;
+  $name =~ s/.*://;
+
+  return $_[0]->{cb}->($_[0], $name, @_[1 .. $#_]);
+}
 
 sub new {
   my ($class, $cb) = @_;
@@ -16,15 +33,6 @@ sub new {
   bless $self, $class;
 
   return $self;
-}
-
-sub AUTOLOAD {
-  die "$_[0] is not an object" if !ref $_[0];
-
-  my $name = $AUTOLOAD;
-  $name =~ s/.*://;
-
-  return $_[0]->{cb}->($_[0], $name, @_[1 .. $#_]);
 }
 
 ## Prevent DESTROY method from being handled by AUTOLOAD
@@ -58,9 +66,13 @@ Object::Sub - Create objects without those pesky classes
     $obj->whatever(123);
     ## self: Object::Sub=HASH(0xc78eb0), method name: whatever, first arg: 123
 
+    $obj->(123);
+    ## self: Object::Sub=HASH(0xc78eb0), method name: , first arg: 123
+    ##   ($method is undef)
+
 =head1 DESCRIPTION
 
-Sometimes you want something that acts like an object but you don't want to go to all the trouble of creating a new package, with constructor and methods and so on. This module is a trivial wrapper around perl's L<AUTOLOAD> functionality which intercepts method calls and lets you handle them in a single C<sub>.
+Sometimes you want something that acts like an object but you don't want to go to all the trouble of creating a new package, with constructor and methods and so on. This module is a trivial wrapper around perl's L<AUTOLOAD> functionality which intercepts method calls and lets you handle them in a single C<sub>. It also uses L<overload> so that you can additionally treat the object as a C<sub> if you desire.
 
 =head1 USE-CASES
 
@@ -77,6 +89,8 @@ L<AUTOLOAD> allows you to dispatch on method names at run-time which can sometim
 
                 return decode_json($rpc_output);
               });
+
+Because C<Object::Sub> objects can also be treated as subs, your RPC interface can support sub-routine calls on the objects as well as method calls, even on the same object.
 
 =head2 PLACE-HOLDER OBJECTS
 

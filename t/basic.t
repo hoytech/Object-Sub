@@ -1,6 +1,6 @@
 use strict;
 
-use Test::More tests => 7;
+use Test::More tests => 18;
 
 use Object::Sub;
 
@@ -17,6 +17,10 @@ use Object::Sub;
 
   $o->hello('world');
 }
+
+
+
+
 
 
 
@@ -67,4 +71,54 @@ use Object::Sub;
   is (ref $o, 'Object::Sub::Test::Counter');
 
   is ($o->add(1), 5);
+
+  is ($o->get(), 5);
+}
+
+
+
+## Invoked as sub
+
+{
+  my $o = Object::Sub->new(sub {
+    my ($self, $method, @args) = @_;
+
+    is(ref $self, 'Object::Sub');
+    is($method, undef);
+    is($args[0], 'hello');
+    is($args[1], 'world');
+  });
+
+  $o->('hello', 'world');
+}
+
+
+
+{
+  my $o = Object::Sub->new(sub {
+    $_[0] = sub { return "AFTER" };
+
+    return "BEFORE";
+  });
+
+  is($o->(), "BEFORE");
+  is($o->(), "AFTER");
+}
+
+
+
+
+## Can use either methods or subs
+
+{
+  my $o = Object::Sub->new(sub {
+    my ($self, $method, @args) = @_;
+
+    is ($args[0], 123);
+
+    return $method;
+  });
+
+  is ($o->(123), undef);
+  is ($o->hello(123), 'hello');
 }
