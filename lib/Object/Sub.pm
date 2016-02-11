@@ -78,7 +78,7 @@ Sometimes you want something that acts like an object but you don't want to go t
 
 =head2 AUTOLOAD SYNTACTIC SUGAR
 
-L<AUTOLOAD> allows you to dispatch on method names at run-time which can sometimes be useful, for example in RPC protocols where you transmit method call messages to another process for them to be executed remotely. Unfortunately, using L<AUTOLOAD> is a bit annoying since the interface is somewhat arcane. L<Object::Instance> is a nicer interface to the most commonly used AUTOLOAD functionality:
+L<AUTOLOAD> allows you to dispatch on method names at run-time which can sometimes be useful, for example in RPC protocols where you transmit method call messages to another process for them to be executed remotely. Unfortunately, using L<AUTOLOAD> is a bit annoying since the interface is somewhat arcane. L<Object::Sub> is a nicer interface to the most commonly used AUTOLOAD functionality:
 
     my $obj = Object::Sub->new(sub {
                 my ($self, $method, @args) = @_;
