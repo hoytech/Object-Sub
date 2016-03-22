@@ -94,12 +94,10 @@ Because C<Object::Sub> objects can also be treated as subs, your RPC interface c
 
 =head2 PLACE-HOLDER OBJECTS
 
-Some APIs require you to pass in or provide an object but then don't actually end up using it. Instead of passing in undef and getting a weird C<Can't call method "XYZ" on an undefined value> error, you can pass in an L<Object::Sub> which will throw a helpful exception instead:
+Some APIs require you to pass in or provide an object but then don't actually end up using it. Instead of passing in undef and getting a weird C<Can't call method "XYZ" on an undefined value> error, you can pass in an L<Object::Sub> which will throw a "helpful" exception instead:
 
     my $obj = Some::API->new(
-                logger => Object::Sub->new(sub {
-                            die "Please provide an 'logger' object to Some::API"
-                          })
+                logger => Object::Sub->new(sub { die "FIXME: add logger" }),
               );
 
 Alternatively, you may choose to minimally implement the API "inline" in your program:
@@ -158,7 +156,7 @@ With L<Object::Sub> you can lazily "create" and pass around objects before their
 
 =head1 BUGS
 
-Although not really a bug in this module, common perl code tends to copy references of objects. Any code that overwrites the caller object (for example in the L<LAZY OBJECT CREATION> section) may only update one of the copies.
+Although not really a bug in this module, common perl code tends to copy references of objects. Any code that overwrites the caller object (for example in the L<LAZY OBJECT CREATION> section) will only update one of the copies.
 
 
 =head1 SEE ALSO
@@ -171,6 +169,6 @@ Doug Hoyte, C<< <doug@hcsw.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2015 Doug Hoyte.
+Copyright 2015-2016 Doug Hoyte.
 
 This module is licensed under the same terms as perl itself.
