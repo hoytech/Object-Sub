@@ -1,6 +1,6 @@
 use strict;
 
-use Test::More tests => 18;
+use Test::More tests => 21;
 
 use Object::Sub;
 
@@ -121,4 +121,28 @@ use Object::Sub;
 
   is ($o->(123), undef);
   is ($o->hello(123), 'hello');
+}
+
+
+
+## Can use a hash
+
+{
+  my $o = Object::Sub->new({
+    add => sub {
+      my ($self, $num1, $num2) = @_;
+      return $num1 + $num2;
+    },
+    mul => sub {
+      my ($self, $num1, $num2) = @_;
+      return $num1 * $num2;
+    },
+  });
+
+  is ($o->add(5, 8), 13);
+  is ($o->mul(5, 8), 40);
+  eval {
+    is ($o->asdf(5, 8), 40);
+  };
+  like($@, qr/unable to find method/);
 }

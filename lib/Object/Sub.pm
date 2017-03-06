@@ -27,6 +27,13 @@ sub AUTOLOAD {
 sub new {
   my ($class, $cb) = @_;
 
+  if (ref $cb eq 'HASH') {
+    my $orig_cb = $cb;
+    $cb = sub {
+      ($orig_cb->{$_[1]} || die "unable to find method $_[1]")->($_[0], @_[2 .. $#_]);
+    };
+  }
+
   die "need a callback" if ref $cb ne 'CODE';
 
   my $self = { cb => $cb, };
@@ -69,6 +76,22 @@ Object::Sub - Create objects without those pesky classes
     $obj->(123);
     ## self: Object::Sub=HASH(0xc78eb0), method name: , first arg: 123
     ##   ($method is undef)
+
+Alternatively, you can use a hash of subs:
+
+    my $obj = Object::Sub->new({
+        add => sub {
+            my ($self, $num1, $num2) = @_;
+            return $num1 + $num2;
+        },
+        mul => sub {
+            my ($self, $num1, $num2) = @_;
+            return $num1 * $num2;
+        },
+    });
+
+    $obj->add(2, 3);
+    ## => 5
 
 =head1 DESCRIPTION
 
