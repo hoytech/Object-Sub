@@ -11,7 +11,7 @@ use overload fallback => 1,
                         my $self_ref = \$_[0];
 
                         return sub {
-                          return $$self_ref->{cb}->($$self_ref, undef, @_);
+                          return $$self_ref->{__object_sub_internal_cb}->($$self_ref, undef, @_);
                         };
                       };
 
@@ -21,7 +21,7 @@ sub AUTOLOAD {
   my $name = $AUTOLOAD;
   $name =~ s/.*://;
 
-  return $_[0]->{cb}->($_[0], $name, @_[1 .. $#_]);
+  return $_[0]->{__object_sub_internal_cb}->($_[0], $name, @_[1 .. $#_]);
 }
 
 sub new {
@@ -36,7 +36,7 @@ sub new {
 
   die "need a callback" if ref $cb ne 'CODE';
 
-  my $self = { cb => $cb, };
+  my $self = { __object_sub_internal_cb => $cb, };
   bless $self, $class;
 
   return $self;
