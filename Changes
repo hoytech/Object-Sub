@@ -1,3 +1,6 @@
+0.103   2017-03-06
+  * Support passing in hash of subs when creating object
+
 0.102   2016-03-22
   * Support invoking objects as subs (code refs) as well as objects
   * Doc updates
